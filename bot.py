@@ -22,8 +22,8 @@ def run_flask():
 threading.Thread(target=run_flask, daemon=True).start()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [[InlineKeyboardButton("🔥 Inizia Creazione HD", callback_data="step_hair")]]
-    await update.message.reply_text("Benvenuto nel generatore ultra-realistico avanzato. Scegli le opzioni per iniziare:", reply_markup=InlineKeyboardMarkup(keyboard))
+    keyboard = [[InlineKeyboardButton("🔥 Inizia Creazione Reale HD", callback_data="step_hair")]]
+    await update.message.reply_text("Benvenuto nel generatore iper-realistico. Scegli le opzioni per iniziare:", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -38,7 +38,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         await query.edit_message_text("Seleziona il colore dei capelli:", reply_markup=InlineKeyboardMarkup(keyboard))
 
-    # 2. Corporatura e Stile Fisico
+    # 2. Corporatura
     elif data.startswith("hair_"):
         context.user_data['hair'] = data.split("_")[1]
         keyboard = [
@@ -57,7 +57,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         await query.edit_message_text("Vuoi includere dettagli sui peli pubici?", reply_markup=InlineKeyboardMarkup(keyboard))
 
-    # 4. Densità peli pubici
+    # 4. Densità peli pubici potenziata e reale
     elif data.startswith("pubic_"):
         choice = data.split("_")[1]
         if choice == "yes":
@@ -70,14 +70,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text("Seleziona la quantità esatta di peli pubici:", reply_markup=InlineKeyboardMarkup(keyboard))
         else:
             context.user_data['pubic_choice'] = "no"
-            # Passa alla scelta dell'ambiente
             await mostra_ambienti(query)
 
     elif data.startswith("density_"):
         context.user_data['density'] = data.split("_")[1]
         await mostra_ambienti(query)
 
-    # 5. Scelta dell'Ambiente / Sfondo
+    # 5. Ambiente
     elif data.startswith("env_"):
         context.user_data['environment'] = data.split("_")[1]
         keyboard = [
@@ -86,9 +85,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("A Pecora / In ginocchio", callback_data="pos_doggy")],
             [InlineKeyboardButton("Gambe aperte / Intima", callback_data="pos_spread")]
         ]
-        await query.edit_message_text("Seleziona la posizione intima o la postura:", reply_markup=InlineKeyboardMarkup(keyboard))
+        await query.edit_message_text("Seleziona la posizione intima:", reply_markup=InlineKeyboardMarkup(keyboard))
 
-    # 6. Scelta della Posizione Intima e Generazione Finale
+    # 6. Posizione e Generazione Finale
     elif data.startswith("pos_"):
         context.user_data['position'] = data.split("_")[1]
         await procedi_generazione(query, context)
@@ -105,20 +104,23 @@ async def mostra_ambienti(query):
 async def procedi_generazione(query, context):
     hair = context.user_data.get('hair', 'blonde')
     
-    # Variabilità dei volti ed etnie per evitare cloni
+    # Tantissime tipologie di persone, volti ed etnie completamente diverse per evitare i cloni
     faces = [
-        "european facial features, soft green eyes, realistic skin",
-        "mediterranean facial features, sharp jawline, brown expressive eyes",
-        "scandinavian facial features, high cheekbones, striking blue eyes",
-        "latina facial features, warm skin tone, deep dark eyes",
-        "slavic facial features, delicate nose, piercing gaze"
+        "authentic european woman, natural freckles on nose, soft green eyes, realistic face",
+        "mediterranean woman, sharp jawline, warm olive skin, thick eyebrows, brown eyes",
+        "scandinavian woman, high cheekbones, natural pale skin, striking blue eyes",
+        "latina woman, warm honey skin tone, expressive dark eyes, natural lips",
+        "slavic woman, delicate features, piercing gray eyes, natural facial structure",
+        "mixed race woman, glowing warm skin tone, freckles, beautiful unique dark eyes",
+        "balkans woman, strong facial features, expressive hazel eyes, natural look",
+        "british woman, rosy cheeks, natural thin lips, soft blue eyes"
     ]
     random_face = random.choice(faces)
 
     body_map = {
-        'natural': 'natural slim body, slender waist',
-        'large': 'large natural breasts, thick thighs, voluptuous soft curvy body',
-        'athletic': 'toned athletic physique, firm defined muscles, flat stomach'
+        'natural': 'natural slender realistic body, soft hips, realistic skin folds',
+        'large': 'large natural soft breasts, thick thighs, voluptuous curvy body, soft belly fat',
+        'athletic': 'toned athletic physique, firm muscles, natural definition, fit stomach'
     }
     body = body_map.get(context.user_data.get('body'), 'natural body')
 
@@ -126,42 +128,43 @@ async def procedi_generazione(query, context):
     if pubic_choice == 'yes':
         density = context.user_data.get('density', 'medium')
         if density == 'light':
-            pubic_desc = "sparse minimal light pubic hair patch"
+            pubic_desc = "visible sparse light pubic hair patch, natural vagina view"
         elif density == 'heavy':
-            pubic_desc = "very thick, dense, full heavy bush of dark pubic hair, completely natural and abundant"
+            # Forziamo in modo drastico la presenza di peli folti e abbondanti visibili
+            pubic_desc = "extremely thick, heavy, dense full bush of dark pubic hair covering vulva completely, highly detailed realistic pubic hair, fully natural abundant pubic hair"
         else:
-            pubic_desc = "moderate natural pubic hair growth"
+            pubic_desc = "clear visible moderate natural pubic hair growth, realistic vulva"
     else:
-        pubic_desc = "completely shaved smooth clean hairless pubic area"
+        pubic_desc = "completely shaved smooth clean hairless pubic area, bare skin"
 
     env_map = {
-        'bedroom': 'cozy modern bedroom interior background, warm ambient lighting, bokeh',
-        'hotel': 'luxurious high-end hotel room suite, elegant background decor, soft lighting',
-        'bathroom': 'modern luxury bathroom, steamy atmosphere, tiled background, soft reflections',
-        'balcony': 'private balcony at night, distant city lights bokeh background'
+        'bedroom': 'cozy modern bedroom interior background, warm ambient lighting, realistic depth of field',
+        'hotel': 'luxurious high-end hotel room suite, elegant background decor, soft interior lighting',
+        'bathroom': 'modern luxury bathroom, steamy atmosphere, tiled background, realistic wet reflections',
+        'balcony': 'private balcony at night, distant city lights bokeh, realistic night atmosphere'
     }
     environment = env_map.get(context.user_data.get('environment'), 'cozy modern bedroom background')
 
     pos_map = {
-        'wall': 'standing against a wall, seductive provocative pose, full body explicit view',
-        'missionary': 'lying on back, highly seductive expression, intimate angle, legs open',
-        'doggy': 'on hands and knees, arching back, provocative explicit pose',
-        'spread': 'lying down, legs spread wide, extremely intimate angle, explicit view'
+        'wall': 'standing against a wall, seductive provocative pose, full body explicit anatomical view',
+        'missionary': 'lying on back, seductive expression, intimate wide open legs angle, explicit anatomical view',
+        'doggy': 'on hands and knees, arching back, provocative explicit rear anatomical view',
+        'spread': 'lying down, legs spread wide apart, extremely intimate close-up anatomical view, explicit details'
     }
     position = pos_map.get(context.user_data.get('position'), 'seductive intimate pose')
 
-    # Seed casuale per garantire varietà assoluta a ogni generazione
-    random_seed = random.randint(1, 999999)
+    # Seed casuale e unico per ogni richiesta
+    random_seed = random.randint(1, 9999999)
 
-    # Prompt ottimizzato per il massimo fotorealismo HD e dettagli espliciti
+    # Prompt strutturato per rimuovere l'effetto "disegno/illustrazione" e forzare il realismo fotografico estremo
     final_prompt = (
-        f"raw explicit unedited candid DSLR photo of a gorgeous unique woman, {position}, "
-        f"{hair} hair, {random_face}, {body}, {pubic_desc}, "
-        f"{environment}, professional studio lighting, 85mm lens, f/1.4, sharp focus on skin texture, micro-pores, "
-        f"natural skin imperfections, subsurface scattering, masterpiece, 4k resolution"
+        f"raw unedited amateur smartphone photo, real human being, explicit uncensored photography, "
+        f"{position}, {hair} hair, {random_face}, {body}, {pubic_desc}, {environment}, "
+        f"imperfect skin texture, visible pores, natural skin blemishes, soft lighting, realistic shadows, "
+        f"nofilter, 4k realism, realistic human anatomy"
     )
 
-    await query.edit_message_text("⏳ Applicazione ambiente, posizione e rendering HD in corso...")
+    await query.edit_message_text("⏳ Generazione in corso con parametri fotorealistici avanzati...")
 
     encoded_prompt = urllib.parse.quote(final_prompt)
     image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=768&height=1152&nologo=true&seed={random_seed}"
@@ -170,8 +173,8 @@ async def procedi_generazione(query, context):
         chat_id=query.message.chat_id,
         photo=image_url,
         caption=(
-            f"✅ **Immagine HD Personalizzata**\n\n"
-            f"👤 **Variante:** {random_seed}\n"
+            f"✅ **Immagine Reale HD Generata**\n\n"
+            f"👤 **ID Modello Unico:** {random_seed}\n"
             f"💇‍♀️ **Capelli:** {hair} | **Corpo:** {context.user_data.get('body')}\n"
             f"🌿 **Peli pubici:** {pubic_choice} ({context.user_data.get('density', 'nessuno')})\n"
             f"🏡 **Ambiente:** {context.user_data.get('environment')}\n"
@@ -184,7 +187,7 @@ def main():
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
-    print("Bot avanzato con posizioni e sfondi avviato!")
+    print("Bot iper-realistico avviato!")
     app.run_polling()
 
 if __name__ == '__main__':
