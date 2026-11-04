@@ -1,5 +1,7 @@
 import logging
 import os
+import threading
+from flask import Flask
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, CommandHandler, filters
 from duckduckgo_search import DDGS
@@ -11,9 +13,21 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# --- SERVER WEB PER MANTENERE IL BOT ATTIVO SU RENDER ---
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot is active and running!"
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+# --- FUNZIONI DEL BOT TELEGRAM ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "Ciao! Scrivimi il nome o la ricerca che vuoi fare e ti invierò la foto corrispondente."
+        "Ciao! Scrivimi quello che cerchi e ti invierò la foto corrispondente in automatico."
     )
 
 async def search_and_send_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -38,13 +52,19 @@ async def search_and_send_image(update: Update, context: ContextTypes.DEFAULT_TY
         await update.message.reply_text("⚠️ Si è verificato un errore durante la ricerca dell'immagine. Riprova tra poco.")
 
 def main():
-    # Prende il token dalle variabili d'ambiente di Render o usa quello di fallback
+    # Token del bot (prende la variabile d'ambiente da Render o usa il token di fallback)
     TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8835501004:AAGTVfVe19s1ZbHxzqVyr1jKtFW8rtj2b0")
     
     if not TOKEN:
         logger.error("Errore: Token del bot Telegram non trovato!")
         return
 
+    # Avvia il server web Flask in un thread separato (necessario per Render)
+    t = threading.Thread(target=run_web)
+    t.daemon = True
+    t.start()
+
+    # Avvia il bot Telegram
     application = ApplicationBuilder().token(TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
