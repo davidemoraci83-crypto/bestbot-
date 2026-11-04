@@ -22,21 +22,23 @@ def run_flask():
 threading.Thread(target=run_flask, daemon=True).start()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [[InlineKeyboardButton("🔥 Inizia Generazione VIP", callback_data="step_hair")]]
-    await update.message.reply_text("Benvenuto nel generatore basato su modelle reali e celebrità. Scegli le opzioni:", reply_markup=InlineKeyboardMarkup(keyboard))
+    keyboard = [[InlineKeyboardButton("🔥 Scegli la tua Star", callback_data="step_hair")]]
+    await update.message.reply_text("Benvenuto nel generatore di star e modelle famose. Seleziona le opzioni:", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     data = query.data
 
-    # 1. Colore Capelli
+    # 1. Colore Capelli / Categoria Star
     if data == "step_hair":
         keyboard = [
-            [InlineKeyboardButton("Bionda", callback_data="hair_blonde"), InlineKeyboardButton("Mora", callback_data="hair_brunette")],
-            [InlineKeyboardButton("Rossa", callback_data="hair_red"), InlineKeyboardButton("Castana", callback_data="hair_brown")]
+            [InlineKeyboardButton("Bionde Famose (Elsa Jean, Abella Danger, ecc.)", callback_data="hair_blonde")],
+            [InlineKeyboardButton("More Famose (Lana Rhoades, Mia Khalifa, ecc.)", callback_data="hair_brunette")],
+            [InlineKeyboardButton("Rosse Famose (Asa Akira, ecc.)", callback_data="hair_red")],
+            [InlineKeyboardButton("Castane Famose (Adriana Chechik, Kendra Lust, ecc.)", callback_data="hair_brown")]
         ]
-        await query.edit_message_text("Seleziona il colore dei capelli:", reply_markup=InlineKeyboardMarkup(keyboard))
+        await query.edit_message_text("Seleziona il tipo di star:", reply_markup=InlineKeyboardMarkup(keyboard))
 
     # 2. Corporatura
     elif data.startswith("hair_"):
@@ -48,7 +50,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         await query.edit_message_text("Seleziona la corporatura:", reply_markup=InlineKeyboardMarkup(keyboard))
 
-    # 3. Presenza peli pubici
+    # 3. Peli pubici
     elif data.startswith("body_"):
         context.user_data['body'] = data.split("_")[1]
         keyboard = [
@@ -57,7 +59,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         await query.edit_message_text("Vuoi includere dettagli sui peli pubici?", reply_markup=InlineKeyboardMarkup(keyboard))
 
-    # 4. Densità peli pubici
+    # 4. Densità
     elif data.startswith("pubic_"):
         choice = data.split("_")[1]
         if choice == "yes":
@@ -87,7 +89,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         await query.edit_message_text("Seleziona la posizione intima:", reply_markup=InlineKeyboardMarkup(keyboard))
 
-    # 6. Posizione e Generazione Finale
+    # 6. Posizione e Generazione
     elif data.startswith("pos_"):
         context.user_data['position'] = data.split("_")[1]
         await procedi_generazione(query, context)
@@ -104,37 +106,42 @@ async def mostra_ambienti(query):
 async def procedi_generazione(query, context):
     hair = context.user_data.get('hair', 'blonde')
     
-    # Database di modelle e attrici reali famose suddivise per colore di capelli e stile
-    celeb_map = {
+    # Database esteso con tantissime celebrità reali del settore adulto (Pornhub, Brazzers, X-Art, ecc.)
+    stars_map = {
         'blonde': [
-            "adult star Elsa Jean style, natural blonde hair, gorgeous face",
-            "adult star Abella Danger style, blonde hair styling, perfect features",
-            "model Riley Reid style, cute blonde hair, realistic facial structure",
-            "model Madison Ivy style, stunning blonde, natural face"
+            "Elsa Jean face, iconic blonde hair, cute facial features",
+            "Abella Danger face, striking dark blonde hair, intense eyes",
+            "Riley Reid face, playful expression, blonde hair",
+            "Madison Ivy face, gorgeous blonde features",
+            "Brandi Love face, mature blonde adult star features",
+            "Lilly Bell face, petite blonde model look"
         ],
         'brunette': [
-            "adult star Lana Rhoades style, gorgeous brunette hair, iconic facial features",
-            "adult star Mia Khalifa style, dark brunette hair, expressive eyes",
-            "model Angela White style, stunning dark hair, voluptuous features",
-            "adult star Emily Willis style, brunette hair, realistic face"
+            "Lana Rhoades face, iconic brunette features, piercing eyes",
+            "Mia Khalifa face, dark brunette hair, distinctive Middle Eastern features",
+            "Angela White face, stunning brunette, voluptuous face structure",
+            "Emily Willis face, gorgeous brunette model",
+            "Dani Daniels face, artistic dark hair, expressive eyes",
+            "Maitland Ward face, stunning brunette adult actress look"
         ],
         'red': [
-            "adult star Asa Akira style, vibrant red hair styling, unique face",
-            "model Riley Reid with red hair dye style, striking look",
-            "gorgeous redhead adult model style, pale skin, natural face"
+            "Asa Akira face, iconic Asian-American adult star features, dark red hair styling",
+            "Vixen redhead model face, striking features",
+            "High-end redhead adult actress face, pale skin, freckles"
         ],
         'brown': [
-            "adult star Adriana Chechik style, light brown hair, gorgeous face",
-            "model Kendra Lust style, brown hair, mature realistic features",
-            "model Gianna Michaels style, brown hair, voluptuous face"
+            "Adriana Chechik face, light brown hair, energetic expression",
+            "Kendra Lust face, mature brown hair, attractive milf features",
+            "Gianna Michaels face, classic adult star brown hair",
+            "Remy LaCroix face, cute brown hair, unique facial structure"
         ]
     }
     
-    selected_list = celeb_map.get(hair, celeb_map['blonde'])
-    chosen_celeb = random.choice(selected_list)
+    selected_star_list = stars_map.get(hair, stars_map['blonde'])
+    chosen_star = random.choice(selected_star_list)
 
     body_map = {
-        'natural': 'natural slender body, soft realistic skin, hips',
+        'natural': 'natural slender body, soft hips, realistic skin',
         'large': 'large natural soft breasts, thick thighs, voluptuous curvy body, soft belly',
         'athletic': 'toned athletic physique, firm defined muscles, fit stomach'
     }
@@ -170,15 +177,15 @@ async def procedi_generazione(query, context):
 
     random_seed = random.randint(1, 9999999)
 
-    # Prompt ottimizzato per richiamare lo stile visivo delle produzioni professionali reali e ad altissima definizione
+    # Prompt strutturato per replicare fedelmente i volti delle star con qualità fotografica professionale
     final_prompt = (
-        f"professional adult industry photoshoot, uncensored explicit real photography, {chosen_celeb}, "
+        f"professional adult industry photoshoot, uncensored explicit real photography, looking like {chosen_star}, "
         f"{position}, {body}, {pubic_desc}, {environment}, "
         f"RAW photo, Hasselblad camera, 85mm lens, f/1.4, hyper-detailed skin texture, micro-pores, "
         f"natural skin imperfections, professional studio lighting, 4k resolution, masterpiece"
     )
 
-    await query.edit_message_text("⏳ Connessione al database di modelle reali e rendering in corso...")
+    await query.edit_message_text("⏳ Generazione della star selezionata in corso...")
 
     encoded_prompt = urllib.parse.quote(final_prompt)
     image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=768&height=1152&nologo=true&seed={random_seed}"
@@ -187,8 +194,8 @@ async def procedi_generazione(query, context):
         chat_id=query.message.chat_id,
         photo=image_url,
         caption=(
-            f"✅ **Immagine VIP Realistica Generata**\n\n"
-            f"🌟 **Stile Celebrità:** {chosen_celeb.split(' style')[0]}\n"
+            f"✅ **Star Generata con Successo**\n\n"
+            f"🌟 **Riferimento Star:** {chosen_star.split(' face')[0]}\n"
             f"💇‍♀️ **Capelli:** {hair} | **Corpo:** {context.user_data.get('body')}\n"
             f"🌿 **Peli pubici:** {pubic_choice} ({context.user_data.get('density', 'nessuno')})\n"
             f"🏡 **Ambiente:** {context.user_data.get('environment')}\n"
@@ -201,7 +208,7 @@ def main():
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
-    print("Bot VIP avviato con successo!")
+    print("Bot Star VIP avviato!")
     app.run_polling()
 
 if __name__ == '__main__':
