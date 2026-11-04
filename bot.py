@@ -22,8 +22,8 @@ def run_flask():
 threading.Thread(target=run_flask, daemon=True).start()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = [[InlineKeyboardButton("🔥 Inizia Creazione Reale HD", callback_data="step_hair")]]
-    await update.message.reply_text("Benvenuto nel generatore iper-realistico. Scegli le opzioni per iniziare:", reply_markup=InlineKeyboardMarkup(keyboard))
+    keyboard = [[InlineKeyboardButton("🔥 Inizia Generazione VIP", callback_data="step_hair")]]
+    await update.message.reply_text("Benvenuto nel generatore basato su modelle reali e celebrità. Scegli le opzioni:", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -57,15 +57,15 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         await query.edit_message_text("Vuoi includere dettagli sui peli pubici?", reply_markup=InlineKeyboardMarkup(keyboard))
 
-    # 4. Densità peli pubici potenziata e reale
+    # 4. Densità peli pubici
     elif data.startswith("pubic_"):
         choice = data.split("_")[1]
         if choice == "yes":
             context.user_data['pubic_choice'] = "yes"
             keyboard = [
-                [InlineKeyboardButton("Pochi (leggeri / accennati)", callback_data="density_light")],
-                [InlineKeyboardButton("Medi (naturali regolari)", callback_data="density_medium")],
-                [InlineKeyboardButton("Molti (molto folti / abbondanti)", callback_data="density_heavy")]
+                [InlineKeyboardButton("Pochi (leggeri)", callback_data="density_light")],
+                [InlineKeyboardButton("Medi (naturali)", callback_data="density_medium")],
+                [InlineKeyboardButton("Molti (folti / abbondanti)", callback_data="density_heavy")]
             ]
             await query.edit_message_text("Seleziona la quantità esatta di peli pubici:", reply_markup=InlineKeyboardMarkup(keyboard))
         else:
@@ -104,23 +104,39 @@ async def mostra_ambienti(query):
 async def procedi_generazione(query, context):
     hair = context.user_data.get('hair', 'blonde')
     
-    # Tantissime tipologie di persone, volti ed etnie completamente diverse per evitare i cloni
-    faces = [
-        "authentic european woman, natural freckles on nose, soft green eyes, realistic face",
-        "mediterranean woman, sharp jawline, warm olive skin, thick eyebrows, brown eyes",
-        "scandinavian woman, high cheekbones, natural pale skin, striking blue eyes",
-        "latina woman, warm honey skin tone, expressive dark eyes, natural lips",
-        "slavic woman, delicate features, piercing gray eyes, natural facial structure",
-        "mixed race woman, glowing warm skin tone, freckles, beautiful unique dark eyes",
-        "balkans woman, strong facial features, expressive hazel eyes, natural look",
-        "british woman, rosy cheeks, natural thin lips, soft blue eyes"
-    ]
-    random_face = random.choice(faces)
+    # Database di modelle e attrici reali famose suddivise per colore di capelli e stile
+    celeb_map = {
+        'blonde': [
+            "adult star Elsa Jean style, natural blonde hair, gorgeous face",
+            "adult star Abella Danger style, blonde hair styling, perfect features",
+            "model Riley Reid style, cute blonde hair, realistic facial structure",
+            "model Madison Ivy style, stunning blonde, natural face"
+        ],
+        'brunette': [
+            "adult star Lana Rhoades style, gorgeous brunette hair, iconic facial features",
+            "adult star Mia Khalifa style, dark brunette hair, expressive eyes",
+            "model Angela White style, stunning dark hair, voluptuous features",
+            "adult star Emily Willis style, brunette hair, realistic face"
+        ],
+        'red': [
+            "adult star Asa Akira style, vibrant red hair styling, unique face",
+            "model Riley Reid with red hair dye style, striking look",
+            "gorgeous redhead adult model style, pale skin, natural face"
+        ],
+        'brown': [
+            "adult star Adriana Chechik style, light brown hair, gorgeous face",
+            "model Kendra Lust style, brown hair, mature realistic features",
+            "model Gianna Michaels style, brown hair, voluptuous face"
+        ]
+    }
+    
+    selected_list = celeb_map.get(hair, celeb_map['blonde'])
+    chosen_celeb = random.choice(selected_list)
 
     body_map = {
-        'natural': 'natural slender realistic body, soft hips, realistic skin folds',
-        'large': 'large natural soft breasts, thick thighs, voluptuous curvy body, soft belly fat',
-        'athletic': 'toned athletic physique, firm muscles, natural definition, fit stomach'
+        'natural': 'natural slender body, soft realistic skin, hips',
+        'large': 'large natural soft breasts, thick thighs, voluptuous curvy body, soft belly',
+        'athletic': 'toned athletic physique, firm defined muscles, fit stomach'
     }
     body = body_map.get(context.user_data.get('body'), 'natural body')
 
@@ -128,43 +144,41 @@ async def procedi_generazione(query, context):
     if pubic_choice == 'yes':
         density = context.user_data.get('density', 'medium')
         if density == 'light':
-            pubic_desc = "visible sparse light pubic hair patch, natural vagina view"
+            pubic_desc = "visible sparse light pubic hair patch, realistic vulva"
         elif density == 'heavy':
-            # Forziamo in modo drastico la presenza di peli folti e abbondanti visibili
-            pubic_desc = "extremely thick, heavy, dense full bush of dark pubic hair covering vulva completely, highly detailed realistic pubic hair, fully natural abundant pubic hair"
+            pubic_desc = "extremely thick, heavy, dense full bush of dark pubic hair covering vulva completely, highly detailed realistic pubic hair"
         else:
             pubic_desc = "clear visible moderate natural pubic hair growth, realistic vulva"
     else:
         pubic_desc = "completely shaved smooth clean hairless pubic area, bare skin"
 
     env_map = {
-        'bedroom': 'cozy modern bedroom interior background, warm ambient lighting, realistic depth of field',
-        'hotel': 'luxurious high-end hotel room suite, elegant background decor, soft interior lighting',
-        'bathroom': 'modern luxury bathroom, steamy atmosphere, tiled background, realistic wet reflections',
-        'balcony': 'private balcony at night, distant city lights bokeh, realistic night atmosphere'
+        'bedroom': 'luxury bedroom interior, professional studio lighting, 4k',
+        'hotel': 'high-end luxury hotel suite, professional lighting, cinematic',
+        'bathroom': 'modern luxury bathroom, steamy wet environment, professional lighting',
+        'balcony': 'private penthouse balcony at night, city lights bokeh'
     }
-    environment = env_map.get(context.user_data.get('environment'), 'cozy modern bedroom background')
+    environment = env_map.get(context.user_data.get('environment'), 'luxury bedroom interior')
 
     pos_map = {
         'wall': 'standing against a wall, seductive provocative pose, full body explicit anatomical view',
-        'missionary': 'lying on back, seductive expression, intimate wide open legs angle, explicit anatomical view',
+        'missionary': 'lying on back, seductive expression, wide open legs, explicit anatomical view',
         'doggy': 'on hands and knees, arching back, provocative explicit rear anatomical view',
         'spread': 'lying down, legs spread wide apart, extremely intimate close-up anatomical view, explicit details'
     }
     position = pos_map.get(context.user_data.get('position'), 'seductive intimate pose')
 
-    # Seed casuale e unico per ogni richiesta
     random_seed = random.randint(1, 9999999)
 
-    # Prompt strutturato per rimuovere l'effetto "disegno/illustrazione" e forzare il realismo fotografico estremo
+    # Prompt ottimizzato per richiamare lo stile visivo delle produzioni professionali reali e ad altissima definizione
     final_prompt = (
-        f"raw unedited amateur smartphone photo, real human being, explicit uncensored photography, "
-        f"{position}, {hair} hair, {random_face}, {body}, {pubic_desc}, {environment}, "
-        f"imperfect skin texture, visible pores, natural skin blemishes, soft lighting, realistic shadows, "
-        f"nofilter, 4k realism, realistic human anatomy"
+        f"professional adult industry photoshoot, uncensored explicit real photography, {chosen_celeb}, "
+        f"{position}, {body}, {pubic_desc}, {environment}, "
+        f"RAW photo, Hasselblad camera, 85mm lens, f/1.4, hyper-detailed skin texture, micro-pores, "
+        f"natural skin imperfections, professional studio lighting, 4k resolution, masterpiece"
     )
 
-    await query.edit_message_text("⏳ Generazione in corso con parametri fotorealistici avanzati...")
+    await query.edit_message_text("⏳ Connessione al database di modelle reali e rendering in corso...")
 
     encoded_prompt = urllib.parse.quote(final_prompt)
     image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=768&height=1152&nologo=true&seed={random_seed}"
@@ -173,8 +187,8 @@ async def procedi_generazione(query, context):
         chat_id=query.message.chat_id,
         photo=image_url,
         caption=(
-            f"✅ **Immagine Reale HD Generata**\n\n"
-            f"👤 **ID Modello Unico:** {random_seed}\n"
+            f"✅ **Immagine VIP Realistica Generata**\n\n"
+            f"🌟 **Stile Celebrità:** {chosen_celeb.split(' style')[0]}\n"
             f"💇‍♀️ **Capelli:** {hair} | **Corpo:** {context.user_data.get('body')}\n"
             f"🌿 **Peli pubici:** {pubic_choice} ({context.user_data.get('density', 'nessuno')})\n"
             f"🏡 **Ambiente:** {context.user_data.get('environment')}\n"
@@ -187,7 +201,7 @@ def main():
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
-    print("Bot iper-realistico avviato!")
+    print("Bot VIP avviato con successo!")
     app.run_polling()
 
 if __name__ == '__main__':
