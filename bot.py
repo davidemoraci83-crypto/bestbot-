@@ -2,11 +2,27 @@ import logging
 import urllib.parse
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, CallbackQueryHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import threading
 
 # Il tuo token ufficiale del bot
 TOKEN = "8648834944:AAGiLmD4Yz7wysj6IJDLWeZl9185LDNUOSQ"
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+# --- MINI SERVER WEB PER MANTENERE IL BOT GRATIS SU RENDER ---
+class SimpleHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is active!")
+
+def run_web():
+    server = HTTPServer(('0.0.0.0', 10000), SimpleHandler)
+    server.serve_forever()
+
+threading.Thread(target=run_web, daemon=True).start()
+# -----------------------------------------------------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("🔥 Crea Persona Realistica", callback_data="step_hair")]]
@@ -43,7 +59,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         hair = context.user_data.get('hair', 'blonde')
         body = "large breasts, curvy body" if context.user_data.get('body') == 'large' else "natural body"
-        pubic = "detailed pubic hair" if context.user_data.get('pubic'] == 'yes' else "shaved smooth pubic area"
+        pubic = "detailed pubic hair" if context.user_data.get('pubic') == 'yes' else "shaved smooth pubic area"
         
         final_prompt = f"photorealistic raw portrait of a nude woman, full body standing, {hair} hair, {body}, {pubic}, highly detailed skin texture, pores, 8k, masterpiece, professional photography"
         
