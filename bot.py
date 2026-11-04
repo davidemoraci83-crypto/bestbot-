@@ -2,27 +2,25 @@ import logging
 import urllib.parse
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, CallbackQueryHandler
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from flask import Flask
 import threading
 
-# Il tuo token ufficiale del bot
 TOKEN = "8648834944:AAGiLmD4Yz7wysj6IJDLWeZl9185LDNUOSQ"
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-# --- MINI SERVER WEB PER MANTENERE IL BOT GRATIS SU RENDER ---
-class SimpleHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"Bot is active!")
+# --- SERVER WEB FLASK PER MANTENERE IL BOT ATTIVO SU RENDER ---
+web_app = Flask(__name__)
 
-def run_web():
-    server = HTTPServer(('0.0.0.0', 10000), SimpleHandler)
-    server.serve_forever()
+@web_app.route('/')
+def home():
+    return "Bot Telegram attivo!"
 
-threading.Thread(target=run_web, daemon=True).start()
-# -----------------------------------------------------------
+def run_flask():
+    web_app.run(host="0.0.0.0", port=10000)
+
+threading.Thread(target=run_flask, daemon=True).start()
+# -------------------------------------------------------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("🔥 Crea Persona Realistica", callback_data="step_hair")]]
@@ -79,7 +77,7 @@ def main():
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_handler))
-    print("Bot avviato correttamente!")
+    print("Bot avviato correttamente con Flask!")
     app.run_polling()
 
 if __name__ == '__main__':
