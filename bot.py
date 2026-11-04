@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# --- SERVER WEB PER MANTENERE IL BOT ATTIVO SU RENDER ---
+# Server web Flask per mantenere attivo Render
 app = Flask(__name__)
 
 @app.route('/')
@@ -24,11 +24,8 @@ def run_web():
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
 
-# --- FUNZIONI DEL BOT TELEGRAM ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "Ciao! Scrivimi quello che cerchi e ti invierò la foto corrispondente in automatico."
-    )
+    await update.message.reply_text("Ciao! Scrivimi cosa cerchi e ti invierò la foto corrispondente.")
 
 async def search_and_send_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
@@ -49,17 +46,17 @@ async def search_and_send_image(update: Update, context: ContextTypes.DEFAULT_TY
             
     except Exception as e:
         logger.error(f"Errore durante la ricerca: {e}")
-        await update.message.reply_text("⚠️ Si è verificato un errore durante la ricerca dell'immagine. Riprova tra poco.")
+        await update.message.reply_text("⚠️ Si è verificato un errore durante la ricerca. Riprova tra poco.")
 
 def main():
-    # Token del bot (prende la variabile d'ambiente da Render o usa il token di fallback)
+    # Token ufficiale del bot
     TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8835501004:AAGTVfVe19s1ZbHxzqVyr1jKtFW8rtj2b0")
     
     if not TOKEN:
         logger.error("Errore: Token del bot Telegram non trovato!")
         return
 
-    # Avvia il server web Flask in un thread separato (necessario per Render)
+    # Avvia Flask in un thread separato
     t = threading.Thread(target=run_web)
     t.daemon = True
     t.start()
