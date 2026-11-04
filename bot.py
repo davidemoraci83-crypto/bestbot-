@@ -9,7 +9,6 @@ TOKEN = "8648834944:AAGiLmD4Yz7wysj6IJDLWeZl9185LDNUOSQ"
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-# --- SERVER WEB FLASK PER MANTENERE IL BOT ATTIVO SU RENDER ---
 web_app = Flask(__name__)
 
 @web_app.route('/')
@@ -20,7 +19,6 @@ def run_flask():
     web_app.run(host="0.0.0.0", port=10000)
 
 threading.Thread(target=run_flask, daemon=True).start()
-# -------------------------------------------------------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("🔥 Crea Persona Realistica", callback_data="step_hair")]]
