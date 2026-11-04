@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Server web Flask per mantenere attivo Render
+# --- SERVER WEB PER IL WEB SERVICE DI RENDER ---
 app = Flask(__name__)
 
 @app.route('/')
@@ -24,8 +24,9 @@ def run_web():
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
 
+# --- FUNZIONI DEL BOT ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Ciao! Scrivimi cosa cerchi e ti invierò la foto corrispondente.")
+    await update.message.reply_text("Ciao! Scrivimi cosa cerchi e ti invierò la foto.")
 
 async def search_and_send_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
@@ -42,32 +43,25 @@ async def search_and_send_image(update: Update, context: ContextTypes.DEFAULT_TY
             image_url = results['image']
             await update.message.reply_photo(photo=image_url)
         else:
-            await update.message.reply_text("❌ Nessuna immagine trovata per questa ricerca.")
-            
+            await update.message.reply_text("❌ Nessuna immagine trovata.")
     except Exception as e:
-        logger.error(f"Errore durante la ricerca: {e}")
-        await update.message.reply_text("⚠️ Si è verificato un errore durante la ricerca. Riprova tra poco.")
+        logger.error(f"Errore: {e}")
+        await update.message.reply_text("⚠️ Errore durante la ricerca.")
 
 def main():
-    # Token ufficiale del bot
     TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8835501004:AAGTVfVe19s1ZbHxzqVyr1jKtFW8rtj2b0")
     
-    if not TOKEN:
-        logger.error("Errore: Token del bot Telegram non trovato!")
-        return
-
-    # Avvia Flask in un thread separato
+    # Avvia Flask in un thread separato così il Web Service di Render rileva la porta aperta
     t = threading.Thread(target=run_web)
     t.daemon = True
     t.start()
 
     # Avvia il bot Telegram
     application = ApplicationBuilder().token(TOKEN).build()
-    
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), search_and_send_image))
     
-    logger.info("Bot avviato correttamente e in ascolto...")
+    logger.info("Bot in avvio...")
     application.run_polling()
 
 if __name__ == '__main__':
